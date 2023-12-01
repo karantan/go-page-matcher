@@ -1,0 +1,79 @@
+---
+service: page-matcher
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: v1
+  timeout: 600
+  environment:
+    # Add these in AWS CP > Systems Manager > Parameter Store
+    # https://www.serverless.com/framework/docs/providers/aws/guide/variables#reference-variables-using-the-ssm-parameter-store
+    CF_ACCOUNT_ID: ${ssm:/CF_ACCOUNT_ID}
+    CF_ACCESS_KEY_ID: ${ssm:/CF_ACCESS_KEY_ID}
+    CF_ACCESS_KEY_SECRET: ${ssm:/CF_ACCESS_KEY_SECRET}
+    CF_BUCKET_NAME: ${ssm:/CF_BUCKET_NAME}
+    # AWS Lambda provides a /tmp directory with 512 MB of storage for your
+    # function execution. This space is ephemeral and is deleted once the
+    # function execution ends.
+    # https://docs.aws.amazon.com/lambda/latest/dg/API_EphemeralStorage.html
+    TEMPORARY_STORAGE: /tmp
+
+functions:
+  page_matcher:
+    handler: bin/page_matcher
+    layers:
+      - {Ref: ChromiumLambdaLayer}  # ${CamelCaseLayerName} + LambdaLayer
+    events:
+      - sns:
+          arn: !Ref PageMatcher
+          topicName: page-matcher
+    destinations:
+      onSuccess:
+        type: sqs
+        arn:
+          Fn::GetAtt:
+            - SuccessQueue
+            - Arn
+      onFailure:
+        type: sqs
+        arn:
+          Fn::GetAtt:
+            - FailQueue
+            - Arn
+
+resources:
+  Resources:
+    PageMatcher:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: page-matcher
+    SuccessQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: success-matche
+    FailQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: fail-matche
+
+layers:
+  chromium:
+    path: layers/chromium
+    package:
+      include:
+        - ./**
+    description: Chromium binary
+    compatibleRuntimes:
+      - go1.x
+    compatibleArchitectures:
+      - x86_64
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+    - ./functions/**
+    - ./naviga/*
+    - ./storage/*

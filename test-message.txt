@@ -1,0 +1,10 @@
+{
+    "old_page": {
+	    "server_ip": "",
+	    "url": "https://karantan.si"
+    },
+    "new_page": {
+	    "server_ip": "85.90.246.138",
+	    "url": "http://testtist.fun"
+    }
+}
