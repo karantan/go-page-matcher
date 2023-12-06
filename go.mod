@@ -12,6 +12,7 @@ require (
 	github.com/go-rod/rod v0.114.5
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.8.4
+	go.uber.org/mock v0.3.0
 	go.uber.org/zap v1.26.0
 )
 

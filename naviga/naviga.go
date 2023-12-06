@@ -139,8 +139,9 @@ func (n *Naviga) Screenshot() (string, error) {
 	log.Info("Trying to capture the screenshot")
 	n.page.MustScreenshot(n.screenshotPath)
 	objectKey := n.site.domain + ".jpg"
-	storage.Upload(objectKey, n.screenshotPath)
-	url, err := storage.GetPresignURL(objectKey)
+	b := storage.NewR2Client()
+	storage.Upload(b.S3Client, objectKey, n.screenshotPath)
+	url, err := storage.GetPresignURL(b.PresignClient, objectKey)
 	log.Infow("Screenshot captured", "url", url)
 	return url, err
 }
