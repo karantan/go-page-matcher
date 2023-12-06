@@ -3,6 +3,22 @@
 ## Introduction
 **go-page-matcher** is an AWS Lambda tool designed for comparing the similarity of two web pages, particularly useful in site migration processes.
 
+## Tools Used
+
+- **devenv (devenv.sh)**: Enables fast, declarative, reproducible, and composable developer
+environments using Nix.
+- **Go Language**: The backbone of our application, providing efficiency and concurrency.
+- **AWS Lambda**: Our serverless compute service where our function resides and gets executed.
+- **Serverless Framework**: Facilitates deploying and managing applications on cloud platforms
+without worrying about infrastructure.
+
+## Prerequisites
+
+Before diving into `go-screenshoter`, ensure you have the following installed:
+
+- **Nix Language**: Essential for our `devenv` tool.
+- **devenv tool**: Install it by following guidelines [here](devenv.sh).
+
 ## Features
 - Compares web pages for similarity
 - Deployed and managed through AWS Lambda
@@ -10,6 +26,7 @@
 - Outputs results to an SQS queue with detailed similarity analysis
 
 ## Installation and deployment
+
 To install, clone the repository:
 ```bash
 git clone https://github.com/karantan/go-page-matcher.git
@@ -17,7 +34,31 @@ cd go-page-matcher
 go mod tidy
 ```
 
-To deploy on AWS run:
+With `devenv` and `Nix` already installed:
+
+```bash
+direnv shell
+```
+
+This will setup a consistent and reproducible developer environment for you.
+
+
+## Deploy to AWS Lambda
+
+You'll need to download the chromium binary compatible with x86_64.
+E.g. [alixaxel/chrome-aws-lambda](https://raw.githubusercontent.com/alixaxel/chrome-aws-lambda/master/bin/chromium.br)
+
+Extract it in the `layers/chromium` folder and make sure it has executable permissions.
+
+```bash
+wget -P layer https://raw.githubusercontent.com/alixaxel/chrome-aws-lambda/master/bin/chromium.br
+brotli --decompress --rm --output=layer/chromium layers/chromium/chromium.br
+chmod 777 layers/chromium/chromium
+```
+
+Follow Serverless framework guidelines to deploy the function to AWS Lambda. Ensure
+your AWS credentials are properly set up.
+
 ```bash
 make deploy
 ```
@@ -75,12 +116,6 @@ Example of a message in the "success-matche" SQS queue:
     }
 }
 ```
-
-## Requirements
-- AWS Lambda setup
-- SNS and SQS configuration
-- GoLang environment for development
-
 
 ## License
 Licensed under BSD-3-Clause. See `LICENSE` file for details.
