@@ -96,7 +96,7 @@ func handler(_ context.Context, snsEvent events.SNSEvent) (ResponsePayload, erro
 	log.Infow("Jaccard", "similarity", njSimilarity)
 	r.Similarity = njSimilarity
 
-	if njSimilarity < 95 {
+	if njSimilarity < 0.95 {
 		oldScreenshotURL, oerr := o.Screenshot()
 		newScreenshotURL, nerr := n.Screenshot()
 		if oerr == nil && nerr == nil {
