@@ -7,4 +7,4 @@ clean:
 	rm -rf ./bin
 
 deploy: clean build
-	sls deploy --verbose
+	sls deploy --verbose --aws-profile <AWS-PROFILE>
