@@ -4,7 +4,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: provided.al2023
+  runtime: provided.al2
   stage: v1
   timeout: 600
   environment:
@@ -22,7 +22,7 @@ provider:
 
 functions:
   page_matcher:
-    handler: bin/page_matcher
+    handler: bootstrap
     layers:
       - {Ref: ChromiumLambdaLayer}  # ${CamelCaseLayerName} + LambdaLayer
     events:
@@ -66,14 +66,14 @@ layers:
         - ./**
     description: Chromium binary
     compatibleRuntimes:
-      - go1.x
+      - provided.al2
     compatibleArchitectures:
       - x86_64
 
 package:
   patterns:
     - '!./**'
-    - ./bin/**
+    - bootstrap
     - ./functions/**
     - ./naviga/*
     - ./storage/*
